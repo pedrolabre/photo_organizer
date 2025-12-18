@@ -1,15 +1,42 @@
 # Photo Organizer
 
-Organizador de fotos simples — scanner, cálculo de hashes, extração de metadata e organização em pastas. Este repositório contém o código-fonte, scripts de geração de relatórios e uma pequena interface web (Flask) para inspeção.
+Organizador e analisador de coleções de fotos: escaneia diretórios, calcula hashes, extrai metadados, detecta duplicatas e fornece ferramentas para organizar e auditar sua biblioteca.
 
-Status: trabalho em progresso. Documentação principal em `docs/`.
+<!-- BADGES -->
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](#license)
 
-## Requisitos
+Resumo rápido
+- Código principal em `src/` — lógica de scanner, detecção e organização.
+- Interface web mínima em `app.py` (Flask) para inspeção dos resultados.
+- Scripts em `scripts/` geram relatórios em `output/reports/`.
 
-- Python 3.10+ (testado com 3.14)
-- Dependências listadas em `requirements.txt`
+## Sumário
 
-## Instalação (Windows - PowerShell)
+- [Recursos](#recursos)
+- [Pré-requisitos](#pré-requisitos)
+- [Instalação rápida](#instalação-rápida)
+- [Execução](#execução)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Fluxos principais](#fluxos-principais)
+- [Desenvolvimento](#desenvolvimento)
+- [Boas práticas](#boas-práticas)
+- [Licença](#licença)
+
+## Recursos
+
+- Varredura recursiva de diretórios com coleta de metadados EXIF
+- Cálculo de hashes e detecção de duplicatas exatas
+- Movimentação controlada de arquivos (organização / quarentena)
+
+## Pré-requisitos
+
+- Python 3.10 ou superior
+- Recomendado: criar um ambiente virtual
+
+## Instalação rápida
+
+Windows (PowerShell):
 
 ```powershell
 python -m venv venv
@@ -17,63 +44,75 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-## Uso
+Linux / macOS:
 
-- Rodar a interface web (dashboard):
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Execução
+
+1) Rodar a interface web (dashboard):
 
 ```powershell
-# ativa o venv se necessário
 .\venv\Scripts\Activate.ps1
 python app.py
+# abra http://localhost:5000 no navegador
 ```
 
-- Executar a ferramenta/CLI (gera banco e arquivos de saída):
+2) Usar a CLI principal (scaneia e popula o banco):
 
 ```powershell
 .\venv\Scripts\Activate.ps1
-python main.py
+python main.py --path "C:\Fotos" --db data/database/photo_organizer.db
 ```
 
-- Gerar relatórios via script (offline):
+## Estrutura do projeto
 
-```powershell
-.\venv\Scripts\Activate.ps1
-python scripts/generate_reports.py
+- `src/` — implementação principal (scanner, detectores, organização)
+- `app.py` — pequena aplicação Flask para inspeção
+- `main.py` — runner/CLI
+- `scripts/` — utilitários de relatórios e empacotamento
+- `data/` — banco de dados e caches locais (não versionar)
+- `output/` — artefatos gerados (relatórios, organizados, quarantine)
+- `docs/` — documentação e guias (conteúdo versionado)
+
+## Fluxos principais
+
+- Scan → coleta de metadados e hashes → persistência no DB
+- Detecção de duplicatas → marcação/movimentação para `output/quarantine/`
+- Relatórios CSV/JSON/HTML para auditoria e integração
+
+## Desenvolvimento
+
+- Executar testes (quando houver):
+
+```bash
+pytest -q
 ```
 
-Observação: os scripts gravam arquivos em `output/reports/` e movem/quarentenam duplicatas em `output/quarantine/`.
+- Formatação / lint (opcional):
 
-## Estrutura relevante
-
-- `src/` — código fonte principal
-- `app.py` — app Flask para dashboard
-- `main.py` — runner/CLI que cria/usa `data/database/photo_organizer.db`
-- `scripts/` — scripts utilitários (geração de relatórios, empacotamento)
-- `output/` — diretório de saída gerado (relatórios, organizados, quarantine)
-- `data/database/photo_organizer.db` — banco de dados SQLite usado pelo projeto
-- `docs/` — documentação (manter)
-
-## O que NÃO commitar
-
-Arquivos gerados e caches que não pertencem ao código-fonte devem ser ignorados antes do commit. Sugestão mínima de `.gitignore`:
-
-```
-# Virtual environment
-venv/
-
-# Output and data
-output/
-data/logs/
-
-# Python cache
-__pycache__/
-*.pyc
-
-# Reports / generated artifacts
-output/reports/
+```bash
+pip install -r requirements-dev.txt
+black .
+flake8
 ```
 
-## Notas finais
+## Boas práticas
 
-- Já removi temporariamente logs e relatórios gerados do workspace local (conforme pedido). O banco `data/database/photo_organizer.db` foi mantido porque é usado pelo projeto.
-- Se quiser, posso inicializar um repositório `git` local e criar o primeiro commit com o código e `docs/` limpos.
+- Não versionar artefatos gerados localmente: `output/`, `data/logs/`, `__pycache__/`, `venv/`.
+- Mantenha `docs/version2_documentation.html` fora do repositório até a versão 2 estar finalizada (já incluído em `.gitignore`).
+
+## Contribuição
+
+1. Abra uma issue descrevendo a proposta.
+2. Crie um branch com prefixo `feature/` ou `fix/`.
+3. Envie um Pull Request com descrição clara e testes, se aplicável.
+
+## Licença
+
+MIT — consulte o arquivo `LICENSE` para detalhes.
+
