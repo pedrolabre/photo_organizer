@@ -104,7 +104,6 @@ flake8
 ## Boas práticas
 
 - Não versionar artefatos gerados localmente: `output/`, `data/logs/`, `__pycache__/`, `venv/`.
-- Mantenha `docs/version2_documentation.html` fora do repositório até a versão 2 estar finalizada (já incluído em `.gitignore`).
 
 ## Contribuição
 
